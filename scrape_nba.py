@@ -7,23 +7,21 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.action_chains import ActionChains
-import json
 import re
 import pandas as pd
+import requests
 
 directory = r"/Users/anthonyniehuser/Desktop/temp-cpsc410/NBA-position-prediction/chromedriver"
 url = "http://stats.nba.com/leaders/"
 
 def main():
-	
-	
-
 	browser = webdriver.Chrome()
 	browser.get(url)
 
 	# execute js scripts
 	data, years = select_year(browser)
-
+	data_with_pos = add_pos(data)
+	# create a new dataframe by year 
 	for i in range(len(data)):
 		create_dataframe(data[i], years[i])
 
@@ -36,27 +34,15 @@ def main():
 	stat_labels = ["pos", "#","player","gp","min","pts", "fgm", "fga", "fg%", "3pm", "3pa", "3p%", "ftm", "fta", "ft%", "oreb", "dreb", "reb", "ast", "stl", "blk", "tov", "eff"]
 	total_dataframe = pd.DataFrame(total_list, columns=stat_labels)
 	total_dataframe.to_csv("total_dataframe", header=True, index=False)
-
-	# close browser
 	browser.quit()
 
-# for creating josn
-def to_json(data):
-	stat_labels = ["pos", "#","player","gp","min","pts", "fgm", "fga", "fg%", "3pm", "3pa", "3p%", "ftm", "fta", "ft%", "oreb", "dreb", "reb", "ast", "stl", "blk", "tov", "eff"]
-	players = {}
-	
-
-	for j in range(len(data)):
-		stats = {}
-		for i in range(len(stat_labels)):
-			stats[stat_labels[i]] = data[j][i][k]
-		players[data[j][1]] = stats
-	
-	return players
-
+# written by Carl Lundin
+# this method takes a list of data and a string containing it's year
 # method for creating dataframes seperated by what years the players played
 def create_dataframe(data, years):
+	# labels for each column of our dataframe
 	stat_labels = ["pos", "#","player","gp","min","pts", "fgm", "fga", "fg%", "3pm", "3pa", "3p%", "ftm", "fta", "ft%", "oreb", "dreb", "reb", "ast", "stl", "blk", "tov", "eff"]
+	
 	df = pd.DataFrame(data, columns=stat_labels)
 	path = str(years) + "_player_stats"
 	df.to_csv(path, index=False, header=True)  # saves dataframe with labels
@@ -71,13 +57,11 @@ def select_year(browser):
 		select.select_by_visible_text(option.text)
 		# append a 2D list that contains [player][stats]
 		data.append(parse_page(browser))
-	# changes links to a players page to their position on the court 
-	data_with_pos = add_pos(browser, data)
-	return data_with_pos, years
+	# returns our data list containg our stats and a list of years we extracted
+	return data, years
 def parse_page(browser):
 	# list of players
 	data = []
-
 	select_class = "select.stats-table-pagination__select"
 	try:
 		# select page view to see all players at once instead of a limited amount
@@ -122,18 +106,6 @@ def add_links(soup):
 		if "/player/" in player_link and "player//" not in player_link:
 			links.append(player_link)
 	return links
-
-def add_pos(browser, data):
-	# 
-	for i in range(len(data)):
-		for j in range(len(data[i])):
-			site = "http://stats.nba.com" + str(data[i][j][0])
-			browser.get(site)
-			innerHTML = browser.execute_script("return document.body.innerHTML")
-			# find elements with player position
-			elements = browser.find_elements_by_class_name("player-summary__player-pos")
-			data[i][j][0] = elements[0].text
-	return data
 main()
 
 
