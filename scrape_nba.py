@@ -4,15 +4,20 @@ from selenium.webdriver.support.ui import Select
 from selenium.common.exceptions import NoSuchElementException, TimeoutException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.common.action_chains import ActionChains
+# from selenium.webdriver.support import expected_conditions as EC
+# from selenium.webdriver.common.keys import Keys
+# from selenium.webdriver.common.action_chains import ActionChains
 import pandas as pd
 
+
 url = "http://stats.nba.com/leaders/"
+config_path = "prop.config"
+directory_path = ""
 
 def main():
-	browser = webdriver.Chrome()
+	set_directory()
+
+	browser = webdriver.Chrome(directory_path)
 	browser.get(url)
 
 	# execute js scripts
@@ -103,6 +108,13 @@ def add_links(soup):
 		if "/player/" in player_link and "player//" not in player_link:
 			links.append(player_link)
 	return links
+
+def set_directory():
+	f = file.open(config_path, "r")
+	directory_path = f.readline()
+	f.close()
+
+
 main()
 
 
