@@ -6,7 +6,9 @@ import pandas as pd
 
 def vectorize():
     # vectorize player positions
+    # pos_map = {'G':0, 'F':1, 'F-C':1, 'F-G':1, 'G-F':0, 'C-F':2, 'C':2}
     pos_map = {'G':0, 'F':1, 'F-C':2, 'F-G':3, 'G-F':4, 'C-F':5, 'C':6}
+    
 
     # retrieve unedited data set
     df = pd.read_csv("total_dataframe2")
@@ -22,3 +24,4 @@ def vectorize():
     df = df.drop(['player', '#', 'gp', 'min'], axis=1)
 
     df.to_csv("clean_nba_data", index=False, header=True)
+vectorize()

@@ -2,8 +2,12 @@
 # python script to create clusters and visualize our data from stats.nba.com
 from sklearn.cluster import MeanShift
 import pandas as pd
+from nba_reducer import reducer 
+import numpy as np
+
 df = pd.read_csv("clean_nba_data")
-X = df.as_matrix(columns=df.columns[1:23])
+# X = df.as_matrix(columns=df.columns[1:23])
+X, _ = reducer()
 
 ms = MeanShift(bin_seeding=False)
 ms.fit(X)
@@ -30,4 +34,4 @@ for k, col in zip(range(n_clusters_), colors):
     plt.plot(cluster_center[0], cluster_center[1], 'o', markerfacecolor=col,
              markeredgecolor='k', markersize=14)
 plt.title('Estimated number of clusters: %d' % n_clusters_)
-plt.show()
+plt.savefig("pca_data_mshift.png")

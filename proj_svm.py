@@ -8,6 +8,8 @@ from sklearn.model_selection import train_test_split, cross_validate
 
 # retrieve nba data set 
 df = pd.read_csv("clean_nba_data")
+# df.drop(['3pm', '3pa', '3p%'], axis=1)
+# df = df[~df['3pm'].isin(['-'])]
 print(df.head())
 
 X = df.as_matrix(columns=df.columns[1:23])
@@ -19,7 +21,7 @@ X_trn, X_tst, y_trn, y_tst = train_test_split(X, y, test_size=0.4)
 # print(y)
 
 # create a SVM using the ovr type seperator
-clf = svm.LinearSVC(C=5)
+clf = svm.LinearSVC()
 # train SVM with test split data
 clf.fit(X_trn, y_trn)
 # test SVM with the x test data set
